@@ -1,0 +1,180 @@
+/* ── App layout: map fills full viewport ── */
+.app-layout {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── Map fills entire viewport ── */
+.app-map-area {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Right: Chat side panel — fixed overlay like LayerManager ── */
+.app-side-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 400px;
+  height: 100vh;
+  overflow: hidden;
+  background: #fff;
+  border-left: 1px solid rgba(0,0,0,0.06);
+  box-shadow: -2px 0 20px rgba(0,0,0,0.08);
+  z-index: 45;
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.app-side-panel.open {
+  transform: translateX(0);
+}
+
+/* ── Chat FAB ── */
+.chat-fab {
+  position: absolute;
+  bottom: 2rem;
+  right: 1rem;
+  z-index: 45;
+}
+
+/* ███████████████████████████████████████████████████████
+   Chat Interface — bullet-proof flex column, no overflow
+   ███████████████████████████████████████████████████████ */
+
+.chat-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;          /* fill the panel exactly */
+  max-height: 100vh;
+  overflow: hidden;       /* nothing escapes */
+  background: #fff;
+}
+
+.chat-header {
+  flex-shrink: 0;           /* never collapse */
+}
+
+.chat-body {
+  flex: 1 1 0%;
+  min-height: 0;            /* CRITICAL: allow flex child to shrink */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.chat-messages {
+  flex: 1 1 0%;
+  min-height: 0;            /* CRITICAL: allow internal scroll */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.chat-input-bar {
+  flex-shrink: 0;           /* never collapse — stays pinned at bottom */
+}
+
+/* ███████████████████████████████████████████████████████
+   Custom scrollbar
+   ███████████████████████████████████████████████████████ */
+
+.detail-window-content::-webkit-scrollbar,
+.custom-scrollbar::-webkit-scrollbar,
+.chat-messages::-webkit-scrollbar {
+  width: 5px;
+}
+
+.detail-window-content::-webkit-scrollbar-track,
+.custom-scrollbar::-webkit-scrollbar-track,
+.chat-messages::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.detail-window-content::-webkit-scrollbar-thumb,
+.custom-scrollbar::-webkit-scrollbar-thumb,
+.chat-messages::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.08);
+  border-radius: 3px;
+}
+
+.detail-window-content::-webkit-scrollbar-thumb:hover,
+.custom-scrollbar::-webkit-scrollbar-thumb:hover,
+.chat-messages::-webkit-scrollbar-thumb:hover {
+  background: rgba(0,0,0,0.16);
+}
+
+/* ███████████████████████████████████████████████████████
+   Mention dropdown animation
+   ███████████████████████████████████████████████████████ */
+
+@keyframes mentionSlideIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.mention-dropdown {
+  animation: mentionSlideIn 0.15s ease-out;
+}
+
+/* ███████████████████████████████████████████████████████
+   Responsive: small screens — chat becomes overlay
+   ███████████████████████████████████████████████████████ */
+
+@media (max-width: 768px) {
+  .app-side-panel {
+    width: 100vw;
+  }
+}
+
+/* ███████████████████████████████████████████████████████
+   DeckGL container
+   ███████████████████████████████████████████████████████ */
+
+.deckgl-container {
+  width: 100%;
+  height: 100%;
+}
+
+/* ███████████████████████████████████████████████████████
+   Map Attribution Bar
+   ███████████████████████████████████████████████████████ */
+
+.map-attribution-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  /* right is controlled inline to slide with chat panel */
+  z-index: 44;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
+  padding: 3px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: rgba(255, 255, 255, 0.65);
+  background: rgba(0, 0, 0, 0.38);
+  backdrop-filter: blur(6px) saturate(1.4);
+  -webkit-backdrop-filter: blur(6px) saturate(1.4);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: auto;
+  user-select: none;
+}
+
+.map-attribution-bar a {
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.map-attribution-bar a:hover {
+  color: rgba(255, 255, 255, 1);
+  text-decoration: underline;
+}

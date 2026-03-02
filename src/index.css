@@ -1,0 +1,245 @@
+@import "tailwindcss";
+
+/* ══════════════════════════════════════════════════════════
+   SPATIOTEMPORAL LINGUISTICS — Design System
+   Theme: "Manuscript & Stone"
+   Inspired by: ancient scripts, archaeological records, 
+   geological strata, and the atlas of human language.
+   ══════════════════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  /* ── Primary accent · Terracotta / archaelogical clay ── */
+  --color-accent:        #b45309; /* amber-700 */
+  --color-accent-light:  #fef3c7; /* amber-50  */
+  --color-accent-mid:    #d97706; /* amber-600 */
+  --color-accent-dark:   #92400e; /* amber-800 */
+
+  /* ── Surface / Panel tones · parchment + aged linen ── */
+  --color-surface:       #fffcf5; /* warm off-white */
+  --color-surface-raised:#fff8ec; /* cards, raised areas */
+  --color-surface-border:#e8dfce; /* warm stone line  */
+
+  /* ── Text ── */
+  --color-text-primary:  #1c1506; /* near-black, warm */
+  --color-text-muted:    #78716c; /* stone-500 */
+  --color-text-faint:    #a8a29e; /* stone-400 */
+
+  /* ── Interactive ── */
+  --color-focus-ring:    rgba(180, 83, 9, 0.2);
+}
+
+/* ── Base typography ── */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  width: 100vw;
+  height: 100vh;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Panel & Sidebar
+   ══════════════════════════════════════════════════════════ */
+
+/* Layer manager sidebar glass */
+.lm-panel {
+  background: var(--color-surface) !important;
+  border-color: var(--color-surface-border) !important;
+}
+
+/* ══════════════════════════════════════════════════════════
+   App layout
+   ══════════════════════════════════════════════════════════ */
+.app-layout {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+.app-map-area {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Chat side panel ── */
+.app-side-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 400px;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--color-surface);
+  border-left: 1px solid var(--color-surface-border);
+  box-shadow: -4px 0 30px rgba(92, 52, 12, 0.08);
+  z-index: 45;
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.app-side-panel.open {
+  transform: translateX(0);
+}
+
+/* ── Chat FAB ── */
+.chat-fab {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 45;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Chat Interface
+   ══════════════════════════════════════════════════════════ */
+.chat-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  background: var(--color-surface);
+}
+
+.chat-header {
+  flex-shrink: 0;
+  background: var(--color-surface-raised);
+  border-bottom: 1px solid var(--color-surface-border) !important;
+}
+
+.chat-body {
+  flex: 1 1 0%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  background: var(--color-surface);
+}
+
+.chat-messages {
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.chat-input-bar {
+  flex-shrink: 0;
+  background: var(--color-surface-raised);
+  border-top: 1px solid var(--color-surface-border) !important;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Scrollbars — warm stone tint
+   ══════════════════════════════════════════════════════════ */
+.detail-window-content::-webkit-scrollbar,
+.custom-scrollbar::-webkit-scrollbar,
+.chat-messages::-webkit-scrollbar {
+  width: 5px;
+}
+.detail-window-content::-webkit-scrollbar-track,
+.custom-scrollbar::-webkit-scrollbar-track,
+.chat-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+.detail-window-content::-webkit-scrollbar-thumb,
+.custom-scrollbar::-webkit-scrollbar-thumb,
+.chat-messages::-webkit-scrollbar-thumb {
+  background: rgba(120, 80, 30, 0.15);
+  border-radius: 3px;
+}
+.detail-window-content::-webkit-scrollbar-thumb:hover,
+.custom-scrollbar::-webkit-scrollbar-thumb:hover,
+.chat-messages::-webkit-scrollbar-thumb:hover {
+  background: rgba(120, 80, 30, 0.28);
+}
+
+/* ══════════════════════════════════════════════════════════
+   Mention dropdown animation
+   ══════════════════════════════════════════════════════════ */
+@keyframes mentionSlideIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.mention-dropdown {
+  animation: mentionSlideIn 0.15s ease-out;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Tailwind theme overrides — accent colours
+   These classes are used pervasively in JSX; override here.
+   ══════════════════════════════════════════════════════════ */
+
+/* Blue → Amber/Terracotta remapping */
+.bg-blue-600       { background-color: var(--color-accent)       !important; }
+.bg-blue-700       { background-color: var(--color-accent-dark)   !important; }
+.bg-blue-50        { background-color: var(--color-accent-light)  !important; }
+.bg-blue-100       { background-color: #fde68a                   !important; }
+
+.text-blue-600     { color: var(--color-accent)                  !important; }
+.text-blue-500     { color: var(--color-accent-mid)              !important; }
+.text-blue-700     { color: var(--color-accent-dark)             !important; }
+
+.border-blue-600   { border-color: var(--color-accent)           !important; }
+.border-blue-500   { border-color: var(--color-accent-mid)       !important; }
+.border-blue-400   { border-color: #f59e0b                       !important; }
+.border-blue-200   { border-color: #fde68a                       !important; }
+.border-blue-100   { border-color: #fef3c7                       !important; }
+
+.hover\:bg-blue-700:hover { background-color: var(--color-accent-dark) !important; }
+.hover\:bg-blue-50:hover  { background-color: var(--color-accent-light) !important; }
+.hover\:bg-blue-100:hover { background-color: #fde68a !important; }
+.hover\:text-blue-600:hover { color: var(--color-accent) !important; }
+.hover\:border-blue-400:hover { border-color: #f59e0b !important; }
+
+.focus\:border-blue-500:focus { border-color: var(--color-accent-mid) !important; }
+.focus\:ring-blue-100 { --tw-ring-color: var(--color-focus-ring) !important; }
+.shadow-blue-200   { --tw-shadow-color: rgba(180, 83, 9, 0.15)  !important; }
+
+/* from-blue / to-indigo gradient buttons → warm amber→amber-dark */
+.from-blue-600 { --tw-gradient-from: #b45309 !important; }
+.to-indigo-600 { --tw-gradient-to:   #92400e !important; }
+
+/* Revert indigo (only used decoratively in gradient) */
+.bg-indigo-600 { background-color: #92400e !important; }
+
+/* Panel/surface overrides */
+.bg-gray-50 { background-color: var(--color-surface-raised) !important; }
+.bg-white   { background-color: var(--color-surface)        !important; }
+.border-gray-100 { border-color: var(--color-surface-border) !important; }
+.border-gray-200 { border-color: var(--color-surface-border) !important; }
+
+/* Tab underline; filter active bar */
+.bg-blue-600.absolute { background-color: var(--color-accent) !important; }
+
+/* ══════════════════════════════════════════════════════════
+   Numeric filter histogram — amber palette
+   ══════════════════════════════════════════════════════════ */
+.filter-histogram-active { background-color: var(--color-accent-mid) !important; }
+.filter-histogram-muted  { background-color: #e7d3b3 !important; }
+
+/* ══════════════════════════════════════════════════════════
+   DeckGL container
+   ══════════════════════════════════════════════════════════ */
+.deckgl-container {
+  width: 100%;
+  height: 100%;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Responsive
+   ══════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .app-side-panel { width: 100vw; }
+}
