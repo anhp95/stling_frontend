@@ -209,9 +209,12 @@ const Catalog: React.FC<CatalogProps> = ({ onAddDataset, onUploadData, onClose, 
     }
   };
 
+  const combinedTimestamp = useMemo(() => String(Date.now()).slice(-4), [catalog]);
+
   const getFilteredCatalog = useMemo(() => {
     const result: Array<{type: string, datasets: Array<{name: string, count: number}>}> = [];
     const COMBINED_NAME = "Combined";
+    const COMBINED_DISPLAY_NAME = `Combined_${combinedTimestamp}`;
     
     // Add uploaded datasets first
     if (uploadedDatasets.length > 0) {
@@ -237,7 +240,12 @@ const Catalog: React.FC<CatalogProps> = ({ onAddDataset, onUploadData, onClose, 
             );
             
             const finalDatasets = [];
-            if (combinedItem) finalDatasets.push(combinedItem);
+            if (combinedItem) {
+                finalDatasets.push({
+                    ...combinedItem,
+                    name: COMBINED_DISPLAY_NAME
+                });
+            }
             finalDatasets.push(...filteredRegular);
 
             if (finalDatasets.length > 0) {
@@ -246,7 +254,7 @@ const Catalog: React.FC<CatalogProps> = ({ onAddDataset, onUploadData, onClose, 
         });
     }
     return result;
-  }, [catalog, search, selectedType, uploadedDatasets]);
+  }, [catalog, search, selectedType, uploadedDatasets, combinedTimestamp]);
 
   const currentlyVisibleDatasets = useMemo(() => {
     return getFilteredCatalog.flatMap(cat => cat.datasets.map(ds => ds.name));
