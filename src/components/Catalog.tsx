@@ -23,6 +23,15 @@ const Catalog: React.FC<CatalogProps> = ({ onAddDataset, onUploadData, onClose, 
   const [glossSearch, setGlossSearch] = useState('');
   const [isGlossDropdownOpen, setIsGlossDropdownOpen] = useState(false);
   const [lastSelectedGloss, setLastSelectedGloss] = useState<string | null>(null);
+  const [isGlossFilterEnabled, setIsGlossFilterEnabled] = useState(false);
+
+  useEffect(() => {
+    if (!isGlossFilterEnabled) {
+      setSelectedGlosses([]);
+      setGlossSearch('');
+      setIsGlossDropdownOpen(false);
+    }
+  }, [isGlossFilterEnabled]);
   const [selectedDatasets, setSelectedDatasets] = useState<Set<string>>(new Set());
   const [activeTab, setActiveTab] = useState<'browse' | 'upload'>('browse');
   
@@ -262,7 +271,7 @@ const Catalog: React.FC<CatalogProps> = ({ onAddDataset, onUploadData, onClose, 
   useEffect(() => {
     setLoading(true);
     const params = new URLSearchParams();
-    if (selectedGlosses.length > 0) {
+    if (isGlossFilterEnabled && selectedGlosses.length > 0) {
         selectedGlosses.forEach(g => params.append('glosses', g));
     }
     fetch(`${API_BASE_URL}/catalog?${params.toString()}`)
@@ -278,7 +287,7 @@ const Catalog: React.FC<CatalogProps> = ({ onAddDataset, onUploadData, onClose, 
         setError(err.message);
         setLoading(false);
       });
-  }, [selectedGlosses]);
+  }, [selectedGlosses, isGlossFilterEnabled]);
 
   const toggleGloss = (gloss: string) => {
     const isAdding = !selectedGlosses.includes(gloss);
@@ -339,7 +348,7 @@ const Catalog: React.FC<CatalogProps> = ({ onAddDataset, onUploadData, onClose, 
                 onUploadData(ds.data, ds.filteredData, ds.name, ds.coords, ds.type, ds.geoData, ds.duckdbTable);
             }
         } else {
-            onAddDataset(type, name, { glosses: selectedGlosses });
+            onAddDataset(type, name, { glosses: isGlossFilterEnabled ? selectedGlosses : [] });
         }
     });
   };
@@ -434,18 +443,31 @@ const Catalog: React.FC<CatalogProps> = ({ onAddDataset, onUploadData, onClose, 
                 >
                     <div className="flex items-center justify-between ml-1">
                         <div className="flex items-center gap-3">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-blue-600">Concepticon Gloss</label>
-                            <span className="text-[9px] font-black bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-full uppercase tracking-tighter">
-                                {selectedGlosses.length} selected
-                            </span>
-                            <button 
-                                onClick={handleSelectAllGlosses}
-                                className="text-[10px] font-black text-blue-600 hover:text-blue-800 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100 transition-colors"
-                            >
-                                SELECT ALL {glossSearch ? 'MATCHING' : ''}
-                            </button>
+                            <label className="flex items-center gap-2 cursor-pointer bg-blue-50/50 hover:bg-blue-50 px-2 py-1 rounded-lg border border-blue-100/50 transition-colors">
+                                <input
+                                    type="checkbox"
+                                    className="w-3.5 h-3.5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                                    checked={isGlossFilterEnabled}
+                                    onChange={(e) => setIsGlossFilterEnabled(e.target.checked)}
+                                />
+                                <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 select-none">Include Concepticon gloss</span>
+                            </label>
+                            
+                            {isGlossFilterEnabled && (
+                                <>
+                                    <span className="text-[9px] font-black bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-full uppercase tracking-tighter">
+                                        {selectedGlosses.length} selected
+                                    </span>
+                                    <button 
+                                        onClick={handleSelectAllGlosses}
+                                        className="text-[10px] font-black text-blue-600 hover:text-blue-800 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100 transition-colors"
+                                    >
+                                        SELECT ALL {glossSearch ? 'MATCHING' : ''}
+                                    </button>
+                                </>
+                            )}
                         </div>
-                        {selectedGlosses.length > 0 && (
+                        {isGlossFilterEnabled && selectedGlosses.length > 0 && (
                             <button 
                                 onClick={() => setSelectedGlosses([])}
                                 className="text-[10px] font-bold text-red-500 hover:text-red-700 underline"
@@ -454,7 +476,7 @@ const Catalog: React.FC<CatalogProps> = ({ onAddDataset, onUploadData, onClose, 
                             </button>
                         )}
                     </div>
-                    <div className="relative group/gloss">
+                    <div className={`relative group/gloss ${!isGlossFilterEnabled ? 'opacity-50 pointer-events-none' : ''}`}>
                         <div className="absolute left-3 top-3 z-10 transition-transform group-hover/gloss:scale-110">
                             <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
