@@ -5,6 +5,7 @@ import Map from 'react-map-gl/maplibre';
 import DeckGL from '@deck.gl/react';
 import { TileLayer } from '@deck.gl/geo-layers';
 import { BitmapLayer, ScatterplotLayer, GeoJsonLayer, TextLayer } from '@deck.gl/layers';
+import { MapView } from '@deck.gl/core';
 import { tableFromIPC } from 'apache-arrow';
 import { Rnd } from 'react-rnd';
 import LayerManager from './components/LayerManager';
@@ -1232,6 +1233,7 @@ function App() {
     <div className="app-layout bg-gray-900 font-sans">
       <div className="app-map-area">
       <DeckGL
+        views={new MapView({ repeat: true })}
         viewState={viewState}
         onViewStateChange={({ viewState: vs }) => setViewState(vs as any)}
         controller={{scrollZoom: true, dragPan: true, dragRotate: true}}
