@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { queryDuckDB, getDuckDB } from './utils/duckdb';
 import { WebMercatorViewport } from '@math.gl/web-mercator';
 import Map from 'react-map-gl/maplibre';
@@ -206,10 +206,12 @@ function App() {
     });
   }, [layers.map(l => `${l.id}-${l.visible}-${l.vizField}-${l.palette?.join(',')}-${!!l.data}-${!!l.geoData}`).join('|')]);
 
+  const fetchingSchemas = useRef<Set<string>>(new Set());
+
   // Sync Schema
   useEffect(() => {
     layers.forEach(l => {
-        if (!schema[l.id]) {
+        if (!schema[l.id] && !fetchingSchemas.current.has(l.id)) {
             if (l.type.startsWith('user_upload') && l.data && l.data.length > 0) {
                 // Infer schema from user data
                 const firstRow = l.data[0];
@@ -232,7 +234,8 @@ function App() {
                     });
                     setSchema(prev => ({ ...prev, [l.id]: cols }));
                 }
-            } else if (l.dataset) {
+            } else if (l.dataset && !l.type.startsWith('user_upload')) {
+                fetchingSchemas.current.add(l.id);
                 fetch(`${API_BASE_URL}/schema?data_type=${l.type}&dataset=${l.dataset}`)
                     .then(res => {
                         if (!res.ok) return null;
@@ -245,7 +248,7 @@ function App() {
             }
         }
     });
-  }, [layers]);
+  }, [layers, schema]);
 
   // Apply polygon filter to all spatial layers when polygon changes or new layers are added
   useEffect(() => {

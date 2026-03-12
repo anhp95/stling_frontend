@@ -260,13 +260,19 @@ const Catalog: React.FC<CatalogProps> = ({ onAddDataset, onUploadData, onClose, 
     return getFilteredCatalog.flatMap(cat => cat.datasets.map(ds => ds.name));
   }, [getFilteredCatalog]);
 
+  const lastGlossesUrlRef = useRef<string>('');
+  
   useEffect(() => {
     if (selectedType !== 'spoken_language' && selectedType !== 'all') return;
     const params = new URLSearchParams();
     if (search) {
         currentlyVisibleDatasets.slice(0, 100).forEach(ds => params.append('datasets', ds));
     }
-    fetch(`${API_BASE_URL}/glosses?${params.toString()}`)
+    const url = `${API_BASE_URL}/glosses?${params.toString()}`;
+    if (lastGlossesUrlRef.current === url) return;
+    lastGlossesUrlRef.current = url;
+
+    fetch(url)
       .then(res => res.json())
       .then(data => {
           if (data && data.glosses) {
@@ -276,13 +282,19 @@ const Catalog: React.FC<CatalogProps> = ({ onAddDataset, onUploadData, onClose, 
       .catch(err => console.error("Failed to load glosses", err));
   }, [currentlyVisibleDatasets, selectedType, search]);
 
+  const lastCatalogUrlRef = useRef<string>('');
+
   useEffect(() => {
-    setLoading(true);
     const params = new URLSearchParams();
     if (isGlossFilterEnabled && selectedGlosses.length > 0) {
         selectedGlosses.forEach(g => params.append('glosses', g));
     }
-    fetch(`${API_BASE_URL}/catalog?${params.toString()}`)
+    const url = `${API_BASE_URL}/catalog?${params.toString()}`;
+    if (lastCatalogUrlRef.current === url) return;
+    lastCatalogUrlRef.current = url;
+
+    setLoading(true);
+    fetch(url)
       .then(res => {
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         return res.json();
