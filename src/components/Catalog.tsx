@@ -285,29 +285,31 @@ const Catalog: React.FC<CatalogProps> = ({ onAddDataset, onUploadData, onClose, 
   const lastCatalogUrlRef = useRef<string>('');
 
   useEffect(() => {
-    const params = new URLSearchParams();
-    if (isGlossFilterEnabled && selectedGlosses.length > 0) {
-        selectedGlosses.forEach(g => params.append('glosses', g));
-    }
-    const url = `${API_BASE_URL}/catalog?${params.toString()}`;
-    if (lastCatalogUrlRef.current === url) return;
-    lastCatalogUrlRef.current = url;
+    const glosses = isGlossFilterEnabled ? selectedGlosses : [];
+
+    const cacheKey = JSON.stringify(glosses);
+    if (lastCatalogUrlRef.current === cacheKey) return;
+    lastCatalogUrlRef.current = cacheKey;
 
     setLoading(true);
-    fetch(url)
-      .then(res => {
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-        return res.json();
-      })
-      .then(data => {
-        setCatalog(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        setError(err.message);
-        setLoading(false);
-      });
-  }, [selectedGlosses, isGlossFilterEnabled]);
+    fetch(`${API_BASE_URL}/catalog`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ glosses }),
+        })
+        .then(res => {
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            return res.json();
+        })
+        .then(data => {
+            setCatalog(data);
+            setLoading(false);
+        })
+        .catch(err => {
+            setError(err.message);
+            setLoading(false);
+        });
+    }, [selectedGlosses, isGlossFilterEnabled]);
 
   const toggleGloss = (gloss: string) => {
     const isAdding = !selectedGlosses.includes(gloss);

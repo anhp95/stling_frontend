@@ -117,18 +117,29 @@ function App() {
         if (l.visible && !l.data && !l.isLoading) {
             setLayers(prev => prev.map(layer => layer.id === l.id ? { ...layer, isLoading: true } : layer));
             
-            const params = new URLSearchParams({
-                data_type: l.type,
-                dataset: l.dataset
-            });
+            // const params = new URLSearchParams({
+            //     data_type: l.type,
+            //     dataset: l.dataset
+            // });
             
-            if (l.filters?.glosses && Array.isArray(l.filters.glosses)) {
-                l.filters.glosses.forEach((g: string) => params.append('glosses', g));
-            }
+            // if (l.filters?.glosses && Array.isArray(l.filters.glosses)) {
+            //     l.filters.glosses.forEach((g: string) => params.append('glosses', g));
+            // }
+            // const url = `${API_BASE_URL}/full_data?${params}`;
+
+            const glosses = l.filters?.glosses && Array.isArray(l.filters.glosses) 
+                ? l.filters.glosses 
+                : [];
             
-            const url = `${API_BASE_URL}/full_data?${params}`;
-            
-            fetch(url)
+            fetch(`${API_BASE_URL}/full_data`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    data_type: l.type,
+                    dataset: l.dataset,
+                    glosses,
+                }),
+            })
                 .then(res => res.arrayBuffer())
                 .then(buffer => {
                     try {
